@@ -1,0 +1,176 @@
+﻿<Window x:Class="AnalisadorSintatico.Wpf.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:c="clr-namespace:AnalisadorSintatico.Wpf.Controles"
+        xmlns:v="clr-namespace:AnalisadorSintatico.Wpf.Conversores"
+        mc:Ignorable="d"
+        Title="Analisador Sintático Bottom-Up"
+        Height="Auto"
+        MinWidth="760"
+        SizeToContent="WidthAndHeight"
+        SnapsToDevicePixels="True"
+        WindowStartupLocation="CenterScreen">
+
+    <Window.Resources>
+        <v:StringToBooleanConverter x:Key="StringToBooleanConverter" />
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Label Grid.Row="0"
+               Content="Gramática"
+               Style="{StaticResource LabelDividerStyle}" />
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <Grid Margin="20,5,0,5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="160" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Label Content="Novo Não-Terminal" />
+                <TextBox Grid.Row="1"
+                         Name="textBoxNaoTerminal"
+                         CharacterCasing="Upper"
+                         MaxLength="2"
+                         PreviewTextInput="TextBoxNaoTerminalPreviewTextInput"
+                         KeyUp="AdicionarNaoTerminalOnKeyUp" />
+                <Button Grid.Column="1"
+                        Grid.Row="1"
+                        Content="Adicionar"
+                        Click="AdicionarNaoTerminalOnClick"
+                        IsEnabled="{Binding ElementName=textBoxNaoTerminal, Path=Text, Converter={StaticResource StringToBooleanConverter}}" />
+                <Label Grid.Row="2"
+                       Content="Novo Terminal" />
+                <TextBox Grid.Row="3"
+                         Name="textBoxTerminal"
+                         CharacterCasing="Lower"
+                         MaxLength="2"
+                         KeyUp="AdicionarTerminalOnKeyUp" />
+                <Button Grid.Column="1"
+                        Grid.Row="3"
+                        Content="Adicionar"
+                        Click="AdicionarTerminalOnClick"
+                        IsEnabled="{Binding ElementName=textBoxTerminal, Path=Text, Converter={StaticResource StringToBooleanConverter}}" />
+            </Grid>
+
+            <TextBlock Grid.Column="1"
+                       Name="gramatica"
+                       FontSize="20"
+                       Margin="10,15,10,0"
+                       Text="G = ()"
+                       Style="{StaticResource TextBlockStyle}" />
+        </Grid>
+
+        <Label Grid.Row="2"
+               Name="labelProducoes"
+               Content="Produções"
+               Visibility="Collapsed"
+               Style="{StaticResource LabelDividerStyle}" />
+
+        <ItemsControl Grid.Row="3"
+                      Name="itemsControl"
+                      Margin="20,5,0,5">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="{Binding Valor}"
+                                   FontSize="17"
+                                   Padding="0,3" />
+                        <TextBlock Grid.Column="1"
+                                   Text=" → "
+                                   FontSize="17"
+                                   Padding="0,3" />
+                        <TextBlock Grid.Column="2"
+                                   Text="{Binding ProducoesAsString}"
+                                   FontSize="17"
+                                   Padding="0,3" />
+                        <c:WatermarkTextBox Grid.Column="3"
+                                            KeyUp="AdicionarProducaoOnKeyUp"
+                                            LostFocus="AdicionarProducaoOnLostFocus"
+                                            PreviewKeyDown="AdicionarProducaoOnPreviewKeyUp"
+                                            ToolTip="Clique para adicionar uma produção"
+                                            Placeholder="..." />
+                    </Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <TextBlock Grid.Row="4"
+                   Name="producoes"
+                   TextAlignment="Left"
+                   Style="{StaticResource TextBlockStyle}"
+                   Visibility="Collapsed" />
+
+        <Border Grid.Row="5"
+                Background="WhiteSmoke"
+                BorderBrush="Silver"
+                BorderThickness="0,1,0,0"
+                Margin="0,5,0,0">
+            <Grid HorizontalAlignment="Stretch"
+                  Margin="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <Label Name="labelAviso"
+                       Foreground="Goldenrod"
+                       HorizontalAlignment="Left" />
+                <Button Grid.Column="2"
+                        Content="Gramática 1"
+                        Click="Gramatica1"
+                        ToolTip="Gerar uma gramática para testar o programa" />
+                <Button Grid.Column="3"
+                        Content="Gramática 2"
+                        Click="Gramatica2"
+                        ToolTip="Gerar uma gramática alternativa para testar o programa" Visibility="Collapsed" />
+                <Button Grid.Column="4"
+                        Content="Gramática 3"
+                        Click="Gramatica3"
+                        ToolTip="Gerar uma gramática alternativa para testar o programa" Visibility="Collapsed" />
+                <Button Grid.Column="5"
+                        Content="Gerar Tabela"
+                        Click="GerarTabela" />
+                <Button Grid.Column="6"
+                        Content="Reiniciar"
+                        Click="Reiniciar"
+                        ToolTip="Reiniciar o programa" />
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
