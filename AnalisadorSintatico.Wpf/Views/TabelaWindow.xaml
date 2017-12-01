@@ -7,7 +7,7 @@
         Title="Análise Bottom-Up"
         SizeToContent="Height"
         Width="700"
-        SnapsToDevicePixels="True"
+        SnapsToDevicePixels="False"
         WindowStartupLocation="Manual">
 
     <Grid>
