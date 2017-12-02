@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:c="clr-namespace:AnalisadorSintatico.Wpf.Controles"
         mc:Ignorable="d"
         Title="Análise Bottom-Up"
         SizeToContent="Height"
@@ -123,20 +124,29 @@
 
                                             <Border Grid.Column="1"
                                                     BorderThickness="1,0,0,0">
-                                                <TextBlock Text="{Binding Pilha}"
+                                                <!--<TextBlock Text="{Binding Pilha}"
                                                            HorizontalAlignment="Left"
                                                            Margin="14,0,0,0"
-                                                           Style="{StaticResource TextBlockStyle}" />
+                                                           Style="{StaticResource TextBlockStyle}" />-->
+                                                <c:BindableTextBlock HorizontalAlignment="Left"
+                                                                     Margin="14,0,0,0"
+                                                                     InlineList="{Binding Pilha}"
+                                                                     Style="{StaticResource BindableTextBlockStyle}" />
                                             </Border>
 
                                             <Border Grid.Column="2"
                                                     BorderThickness="1,0,0,0">
-                                                <TextBlock FontStyle="Italic"
+                                                <!--<TextBlock FontStyle="Italic"
                                                            Text="{Binding Entrada}"
                                                            TextAlignment="Right"
                                                            HorizontalAlignment="Right"
                                                            Margin="0,0,14,0"
-                                                           Style="{StaticResource TextBlockStyle}" />
+                                                           Style="{StaticResource TextBlockStyle}" />-->
+                                                <c:BindableTextBlock InlineList="{Binding Entrada}"
+                                                           TextAlignment="Right"
+                                                           HorizontalAlignment="Right"
+                                                           Margin="0,0,14,0"
+                                                                     Style="{StaticResource BindableTextBlockStyle}" />
                                             </Border>
 
                                             <Border Grid.Column="3"

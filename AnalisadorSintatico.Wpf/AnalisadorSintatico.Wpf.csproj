@@ -52,6 +52,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controles\BindableTextBlock.cs" />
     <Compile Include="Modelos\Linha.cs" />
     <Compile Include="Util\UIUtil.cs" />
     <Compile Include="Views\TabelaWindow.xaml.cs">

@@ -85,6 +85,10 @@
                         Value="Center" />
             </Style>
 
+            <Style x:Key="BindableTextBlockStyle" TargetType="{x:Type c:BindableTextBlock}" BasedOn="{StaticResource TextBlockStyle}">
+                
+            </Style>
+
             <Style TargetType="{x:Type Button}">
                 <Setter Property="Margin"
                         Value="5,3" />

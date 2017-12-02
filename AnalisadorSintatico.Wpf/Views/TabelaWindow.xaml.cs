@@ -2,6 +2,7 @@
 using AnalisadorSintatico.Wpf.Util;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -114,24 +115,27 @@ namespace AnalisadorSintatico.Wpf.Views
 
         private void ReconhecerEntrada(object sender, RoutedEventArgs e)
         {
+            var linhas = new List<Linha>();
+            itemsControl.ItemsSource = linhas;
+
             if (String.IsNullOrWhiteSpace(textBoxEntrada.Text))
             {
-                AdicionarAviso("Entrada vazia", Brushes.Goldenrod);
+                AdicionarAviso("Entrada vazia  ", Brushes.Goldenrod);
                 return;
             }
 
             // Inicializar variáveis
             var fim = false;
-            var estado = 1;
+            var estado = 0;
             var linha = 0;
-            var linhas = new List<Linha>();
+            
             var pilha = new Stack<string>();
             var entrada = gramatica.EntradaParaPilha(textBoxEntrada.Text.Replace(" ", ""));
 
             // A entrada tem tamanho 1 ($) significa que o usário informou caracteres que não fazem parte da gramática.
             if (entrada.Count == 1)
             {
-                AdicionarAviso("Entrada não reconhecida", Brushes.Red);
+                AdicionarAviso("Entrada não reconhecida  ", Brushes.Red);
                 return;
             }
 
@@ -142,7 +146,7 @@ namespace AnalisadorSintatico.Wpf.Views
             pilha.Push("0");
 
             int j = 0;
-            while (!fim && j < 12)
+            while (!fim)
             {
                 j++;
                 linha++;
@@ -152,7 +156,14 @@ namespace AnalisadorSintatico.Wpf.Views
                 var index = tabelaLSR[0].FindIndex(x => x == topoEntrada);
 
                 // Obtém a ação a ser efetuada.
-                var acao = tabelaLSR[estado][index];
+                var acao = tabelaLSR[estado + 1][index];
+
+                // Se a ação está em braco, então a entrada não é reconhecida.
+                if (String.IsNullOrEmpty(acao))
+                {
+                    TerminarExecucao("Rejeita");
+                    break;
+                }
 
                 // Transforma a ação em um vetor de char, para identificar se deve empilhar ou reduzir.
                 var partes = acao.ToCharArray();
@@ -169,7 +180,7 @@ namespace AnalisadorSintatico.Wpf.Views
                     entrada.Pop();
 
                     // Obtém o próximo estado 's4' -> estado = 4
-                    estado = Convert.ToInt32(partes[1].ToString()) + 1;
+                    estado = Convert.ToInt32(partes[1].ToString());
                 }
                 else if (partes[0] == 'r')
                 {
@@ -177,14 +188,14 @@ namespace AnalisadorSintatico.Wpf.Views
                     AdicionarLinha("Reduzir " + prod);
 
                     // Reduz e retorna o próximo estado.
-                    estado = gramatica.Reduzir(pilha, tabelaLSR, prod);                    
+                    estado = gramatica.Reduzir(pilha, tabelaLSR, prod);   
+                    
+                    if (prod.Gerador == gramatica.SimboloInicial.Valor && entrada.Count == 1)
+                    {
+                        TerminarExecucao("Aceita");
+                    }
                 }                
-
-                //fim = true;
             }
-
-            AdicionarLinha("Reduzir F id");
-            itemsControl.ItemsSource = linhas;
 
             void AdicionarAviso(string aviso, SolidColorBrush cor)
             {
@@ -194,13 +205,22 @@ namespace AnalisadorSintatico.Wpf.Views
 
             void AdicionarLinha(string acao)
             {
-                linhas.Add(new Linha()
+                var l = new Linha()
                 {
+                    Acao = acao,
                     Passo = linha,
-                    Pilha = StringExtensions.StackToString(pilha, true),
-                    Entrada = StringExtensions.StackToString(entrada),
-                    Acao = acao
-                });
+                    Entrada = gramatica.EntradaParaInline(entrada),
+                    Pilha = gramatica.PilhaParaInline(pilha) 
+                };
+
+                linhas.Add(l);
+            }
+
+            void TerminarExecucao(string acao)
+            {
+                fim = true;
+                linha++;
+                AdicionarLinha(acao);
             }
         }
     }

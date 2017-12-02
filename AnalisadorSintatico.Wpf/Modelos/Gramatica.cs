@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows;
+using System.Windows.Documents;
 
 namespace AnalisadorSintatico.Wpf.Modelos
 {
@@ -24,16 +27,40 @@ namespace AnalisadorSintatico.Wpf.Modelos
         /// Obtém ou define os Não-Terminais da gramática.
         /// </summary>
         public List<NT> NaoTerminais { get; set; }
+
+        /// <summary>
+        /// Obtém o símbolo de início.
+        /// </summary>
+        public NT SimboloInicial => NaoTerminais.FirstOrDefault() ?? new NT("?");
         
         /// <summary>
         /// Obtém ou define as produções da gramática.
         /// </summary>
         public List<Producao> Producoes { get; internal set; }
         
+        /// <summary>
+        /// Determina se o simbolo é um Terminal.
+        /// </summary>
+        /// <param name="simbolo">O simbolo a ser testado.</param>
+        /// <returns>Verdadeiro se for Terminal; senão, falso.</returns>
         public bool IsTerminal(string simbolo)
         {
             foreach (T t in Terminais)
                 if (t.Valor.Equals(simbolo))
+                    return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// Determina se o simbolo é um Não-Terminal.
+        /// </summary>
+        /// <param name="simbolo">O simbolo a ser testado.</param>
+        /// <returns>Verdadeiro se for Não-Terminal; senão, falso.</returns>
+        public bool IsNaoTerminal(string simbolo)
+        {
+            foreach (NT nt in NaoTerminais)
+                if (nt.Valor.Equals(simbolo))
                     return true;
 
             return false;
@@ -65,6 +92,9 @@ namespace AnalisadorSintatico.Wpf.Modelos
             return producao;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void NumerarProducoes()
         {
             Producoes = new List<Producao>()
@@ -221,6 +251,9 @@ namespace AnalisadorSintatico.Wpf.Modelos
             return true;
         }
         
+        /// <summary>
+        /// 
+        /// </summary>
         public void OrdenarTerminaisAlfabeticamente()
         {
             Terminais = Terminais.OrderByDescending(t => t.Valor).ToList();
@@ -240,6 +273,13 @@ namespace AnalisadorSintatico.Wpf.Modelos
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pilha"></param>
+        /// <param name="tabelaSLR"></param>
+        /// <param name="producao"></param>
+        /// <returns></returns>
         public int Reduzir(Stack<string> pilha, List<List<string>> tabelaSLR, Producao producao)
         {
             string ladoDireito = "";
@@ -266,18 +306,74 @@ namespace AnalisadorSintatico.Wpf.Modelos
                     pilha.Push(producao.Gerador);
                     pilha.Push(proximoEstado);
 
-                    return Convert.ToInt32(proximoEstado) + 1;
+                    return Convert.ToInt32(proximoEstado);
                 }
                 else
                 {
-                    ladoDireito += simbolo;
+                    // Lê o símbolo ao contrário, por isso insere no início ao invés de concatenar.
+                    ladoDireito = ladoDireito.Insert(0, simbolo);
 
-                    if (producao.Valor == ladoDireito)
+                    if (producao.Valor == ladoDireito && ladoDireito.Length == producao.Valor.Length)
                         achou = true;
                 }
             }
 
             return count;
+        }
+
+        public ObservableCollection<Inline> PilhaParaInline(Stack<string> pilha)
+        {
+            int i = 0;
+            var inlines = new ObservableCollection<Inline>();
+
+            foreach (string simbolo in pilha.Reverse())
+            {
+                i++;
+
+                var r = new Run() { Text = simbolo };
+
+                //if (i <= pilha.Count)
+                    r.Text += " ";
+
+                if (IsTerminal(simbolo) || IsNaoTerminal(simbolo))
+                {
+                    r.FontStyle = FontStyles.Italic;
+                    r.FontWeight = FontWeights.Bold;
+                    r.Text += " ";
+                }
+
+                inlines.Add(r);
+            }
+
+            return inlines;
+        }
+
+        public ObservableCollection<Inline> EntradaParaInline(Stack<string> entrada)
+        {
+            int i = 0;
+            var inlines = new ObservableCollection<Inline>();
+
+            foreach (string simbolo in entrada)
+            {
+                i++;
+
+                var r = new Run() { Text = simbolo };
+
+                if (!simbolo.Equals("$"))
+                {
+                    r.FontStyle = FontStyles.Italic;
+                    r.FontWeight = FontWeights.Bold;
+                    r.Text += " ";
+                }
+                else
+                {
+                    r.Text = r.Text.Insert(0, " ");
+                }
+
+                inlines.Add(r);
+            }
+
+            return inlines;
         }
     }
 }
