@@ -47,19 +47,11 @@ namespace AnalisadorSintatico.Wpf.Views
                     new T("*"),
                     new T("("),
                     new T(")"),
-                    new T("id"),
+                    new T("id")
                 }
             };
 
-            producoes = new List<Producao>()
-            {
-                new Producao("E", "E+T"),
-                new Producao("E", "T"),
-                new Producao("T", "T*F"),
-                new Producao("T", "F"),
-                new Producao("F", "(E)"),
-                new Producao("F", "id")
-            };
+            this.gramatica.NumerarProducoes();
 
             tabelaLSR = new List<List<string>>();
 
@@ -101,12 +93,12 @@ namespace AnalisadorSintatico.Wpf.Views
             gridAcao.Children.Add(UIUtil.CreateTextBlock("$", 0, gramatica.Terminais.Count));
             UIUtil.AddColumns(gramatica.NaoTerminais, gridDesvio);            
 
-            for (int i = 0; i < tabelaLSR.Count; i++)
+            for (int i = 1; i < tabelaLSR.Count; i++)
             {
                 var gridTemplate = new Grid();
                 UIUtil.AddColumns(gridTemplate, lenght1, lenght2);
 
-                var tbEstado = UIUtil.CreateTextBlock(i.ToString(), 0, 0);
+                var tbEstado = UIUtil.CreateTextBlock((i - 1).ToString(), 0, 0);
                 var borderAcao = UIUtil.CreateGrid(1);
                 var borderDesvio = UIUtil.CreateGrid(2);
 
@@ -128,6 +120,7 @@ namespace AnalisadorSintatico.Wpf.Views
                 return;
             }
 
+            // Inicializar variáveis
             var fim = false;
             var estado = 1;
             var linha = 0;
@@ -135,6 +128,7 @@ namespace AnalisadorSintatico.Wpf.Views
             var pilha = new Stack<string>();
             var entrada = gramatica.EntradaParaPilha(textBoxEntrada.Text.Replace(" ", ""));
 
+            // A entrada tem tamanho 1 ($) significa que o usário informou caracteres que não fazem parte da gramática.
             if (entrada.Count == 1)
             {
                 AdicionarAviso("Entrada não reconhecida", Brushes.Red);
@@ -144,32 +138,49 @@ namespace AnalisadorSintatico.Wpf.Views
             borderEntrada.Visibility = Visibility.Visible;
             labelAviso.Content = "";
 
+            // Empilha o '0' inicial.
             pilha.Push("0");
 
-            while (!fim)
+            int j = 0;
+            while (!fim && j < 12)
             {
+                j++;
                 linha++;
                 string topoEntrada = entrada.First();
 
+                // Obtém o índice da coluna onde está o topo da entrada.
                 var index = tabelaLSR[0].FindIndex(x => x == topoEntrada);
+
+                // Obtém a ação a ser efetuada.
                 var acao = tabelaLSR[estado][index];
+
+                // Transforma a ação em um vetor de char, para identificar se deve empilhar ou reduzir.
                 var partes = acao.ToCharArray();
 
                 if (partes[0] == 's')
                 {
                     AdicionarLinha("Empilhar");
+
+                    // Empilha o símbolo e o estado
                     pilha.Push(tabelaLSR[0][index]);
                     pilha.Push(partes[1].ToString());
+
+                    // Desempilha a entrada
+                    entrada.Pop();
+
+                    // Obtém o próximo estado 's4' -> estado = 4
+                    estado = Convert.ToInt32(partes[1].ToString()) + 1;
                 }
                 else if (partes[0] == 'r')
                 {
-                    var producao = producoes[Convert.ToInt32(partes[1]) - 1];
-                    AdicionarLinha("Reduzir " + producao);
-                }
+                    Producao prod = gramatica.Producoes[Convert.ToInt32(partes[1].ToString()) - 1];
+                    AdicionarLinha("Reduzir " + prod);
 
-                estado = Convert.ToInt32(partes[1]) + 1;                
+                    // Reduz e retorna o próximo estado.
+                    estado = gramatica.Reduzir(pilha, tabelaLSR, prod);                    
+                }                
 
-                fim = true;
+                //fim = true;
             }
 
             AdicionarLinha("Reduzir F id");

@@ -12,7 +12,7 @@ namespace AnalisadorSintatico.Wpf
         {
             base.OnStartup(e);
 
-            var mainwnd = new TabelaWindow(null, null);
+            var mainwnd = new TabelaWindow(null);
             mainwnd.ShowDialog();
         }
     }

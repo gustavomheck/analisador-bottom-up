@@ -64,7 +64,7 @@ namespace AnalisadorSintatico.Wpf.Views
             else
             {
                 labelAviso.Content = "";
-                var tabela = new TabelaWindow(_gramatica, producoes.Text.Substring(0, producoes.Text.Length - 2));
+                var tabela = new TabelaWindow(_gramatica/*,producoes.Text.Substring(0, producoes.Text.Length - 2)*/);
                 tabela.Show();
             }
         }

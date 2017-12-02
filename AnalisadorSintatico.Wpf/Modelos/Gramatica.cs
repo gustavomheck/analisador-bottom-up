@@ -16,14 +16,19 @@ namespace AnalisadorSintatico.Wpf.Modelos
         }
 
         /// <summary>
-        /// Obtém ou define a lista de Terminais da gramática.
+        /// Obtém ou define os Terminais da gramática.
         /// </summary>
         public List<T> Terminais { get; set; }
 
         /// <summary>
-        /// Obtém ou define a lista de Não-Terminais da gramática.
+        /// Obtém ou define os Não-Terminais da gramática.
         /// </summary>
         public List<NT> NaoTerminais { get; set; }
+        
+        /// <summary>
+        /// Obtém ou define as produções da gramática.
+        /// </summary>
+        public List<Producao> Producoes { get; internal set; }
         
         public bool IsTerminal(string simbolo)
         {
@@ -58,6 +63,19 @@ namespace AnalisadorSintatico.Wpf.Modelos
             }
 
             return producao;
+        }
+
+        public void NumerarProducoes()
+        {
+            Producoes = new List<Producao>()
+            {
+                new Producao("E", "E+T"),
+                new Producao("E", "T"),
+                new Producao("T", "T*F"),
+                new Producao("T", "F"),
+                new Producao("F", "(E)"),
+                new Producao("F", "id")
+            };
         }
 
         /// <summary>
@@ -220,6 +238,46 @@ namespace AnalisadorSintatico.Wpf.Modelos
                     Terminais[i2] = tmp;
                 }
             }
+        }
+
+        public int Reduzir(Stack<string> pilha, List<List<string>> tabelaSLR, Producao producao)
+        {
+            string ladoDireito = "";
+            bool achou = false;
+            int count = -1;
+
+            foreach (var simbolo in pilha)
+            {
+                // Quantidade de simbolos que serão removidos da pilha.
+                count++;
+
+                if (Int32.TryParse(simbolo, out int estadoAnterior))
+                {
+                    if (!achou) continue;
+
+                    for (int i = 0; i < count; i++)
+                    {
+                        pilha.Pop();
+                    }
+                    
+                    string proximoEstado =
+                        tabelaSLR[estadoAnterior + 1][tabelaSLR[0].FindIndex(x => x == producao.Gerador)];
+
+                    pilha.Push(producao.Gerador);
+                    pilha.Push(proximoEstado);
+
+                    return Convert.ToInt32(proximoEstado) + 1;
+                }
+                else
+                {
+                    ladoDireito += simbolo;
+
+                    if (producao.Valor == ladoDireito)
+                        achou = true;
+                }
+            }
+
+            return count;
         }
     }
 }
