@@ -62,9 +62,11 @@
                     </StackPanel>
                 </Border>
 
+                <Label Content="Tabela de reconhecimento"
+                       Style="{StaticResource LabelDividerStyle}" />
                 <Border Name="borderEntrada"
                         BorderThickness="1"
-                        Margin="10,0,10,10"
+                        Margin="10,5,10,10"
                         Visibility="Collapsed">
                     <Grid>
                         <Grid.RowDefinitions>
@@ -183,7 +185,7 @@
                 <TextBox x:Name="textBoxEntrada"
                          Grid.Column="1"
                          CharacterCasing="Lower" 
-                         Text="id*id+id" />
+                         Text="id * id + id" />
                 <Button Grid.Column="2"
                         Content="Reconhecer"
                         Click="ReconhecerEntrada" />

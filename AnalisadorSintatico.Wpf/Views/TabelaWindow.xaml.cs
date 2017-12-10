@@ -36,19 +36,42 @@ namespace AnalisadorSintatico.Wpf.Views
 
             this.gramatica = new Gramatica()
             {
+                //NaoTerminais = new List<NT>()
+                //{
+                //    new NT("E") { Producoes = new List<Producao> { new Producao("E", "E+T"), new Producao("E", "T") } },
+                //    new NT("T") { Producoes = new List<Producao> { new Producao("T", "T*F"), new Producao("T", "F") } },
+                //    new NT("F") { Producoes = new List<Producao> { new Producao("F", "(E)"), new Producao("F", "id") } },
+                //},
+                //Terminais = new List<T>()
+                //{
+                //    new T("+"),
+                //    new T("*"),
+                //    new T("("),
+                //    new T(")"),
+                //    new T("id")
+                //}
+                //NaoTerminais = new List<NT>()
+                //{
+                //    new NT("S") { Producoes = new List<Producao> { new Producao("S", "AB") } },
+                //    new NT("A") { Producoes = new List<Producao> { new Producao("A", "a") } },
+                //    new NT("B") { Producoes = new List<Producao> { new Producao("B", "b") } },
+                //},
+                //Terminais = new List<T>()
+                //{
+                //    new T("a"),
+                //    new T("b")
+                //}
                 NaoTerminais = new List<NT>()
                 {
-                    new NT("E") { Producoes = new List<Producao> { new Producao("E", "E+T"), new Producao("E", "T") } },
-                    new NT("T") { Producoes = new List<Producao> { new Producao("T", "T*F"), new Producao("T", "F") } },
-                    new NT("F") { Producoes = new List<Producao> { new Producao("F", "(E)"), new Producao("F", "id") } },
+                    new NT("S") { Producoes = new List<Producao> { new Producao("S", "a"), new Producao("S", "[L]") } },
+                    new NT("L") { Producoes = new List<Producao> { new Producao("L", "L;S"), new Producao("L", "S") } }
                 },
                 Terminais = new List<T>()
                 {
-                    new T("+"),
-                    new T("*"),
-                    new T("("),
-                    new T(")"),
-                    new T("id")
+                    new T("a"),
+                    new T("["),
+                    new T("]"),
+                    new T(";")
                 }
             };
 
@@ -57,7 +80,9 @@ namespace AnalisadorSintatico.Wpf.Views
             tabelaLSR = new List<List<string>>();
 
             this.gramatica.OrdenarTerminaisAlfabeticamente();
-            GerarTabelaLSR();
+            this.gramatica.Empilhar();
+            this.gramatica.Reduzir();
+            //GerarTabelaLSR();
         }
 
         protected override void OnSourceInitialized(EventArgs e)

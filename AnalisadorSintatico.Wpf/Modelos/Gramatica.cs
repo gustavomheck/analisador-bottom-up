@@ -37,7 +37,7 @@ namespace AnalisadorSintatico.Wpf.Modelos
         /// Obtém ou define as produções da gramática.
         /// </summary>
         public List<Producao> Producoes { get; internal set; }
-        
+
         /// <summary>
         /// Determina se o simbolo é um Terminal.
         /// </summary>
@@ -97,15 +97,20 @@ namespace AnalisadorSintatico.Wpf.Modelos
         /// </summary>
         public void NumerarProducoes()
         {
-            Producoes = new List<Producao>()
-            {
-                new Producao("E", "E+T"),
-                new Producao("E", "T"),
-                new Producao("T", "T*F"),
-                new Producao("T", "F"),
-                new Producao("F", "(E)"),
-                new Producao("F", "id")
-            };
+            Producoes = new List<Producao>();
+
+            foreach (var nt in NaoTerminais)
+                foreach (var p in nt.Producoes)
+                    Producoes.Add(p);
+
+            //{
+            //    new Producao("E", "E+T"),
+            //    new Producao("E", "T"),
+            //    new Producao("T", "T*F"),
+            //    new Producao("T", "F"),
+            //    new Producao("F", "(E)"),
+            //    new Producao("F", "id")
+            //};
         }
 
         /// <summary>
@@ -273,6 +278,47 @@ namespace AnalisadorSintatico.Wpf.Modelos
             }
         }
 
+        private List<ProducaoCanonica> CanonizarProducoes()
+        {
+            var producoes = new List<ProducaoCanonica>();
+            var p1 = new ProducaoCanonica(SimboloInicial.Valor + "'", new List<string>()
+            {
+                ".", SimboloInicial.Valor
+            });
+
+            producoes.Add(p1);
+
+            foreach (var nt in NaoTerminais)
+            {
+                var p = new List<string>();
+                p.AddRange(ProducoesParaLista(nt));
+                producoes.Add(new ProducaoCanonica(nt.Valor, p));
+            }
+
+            return producoes;
+        }
+
+        public void Empilhar()
+        {
+            var estados = new List<Estado>();
+
+            var estado = new Estado()
+            {
+                EstadoAtual = 0,
+                EstadoAnterior = -1,
+                NaoTerminalGerador = null,
+                Producoes = CanonizarProducoes()
+            };
+
+            estados.Add(estado);
+            System.Diagnostics.Debug.WriteLine(estado.ToString());
+        }
+
+        public void Reduzir()
+        {
+
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -374,6 +420,32 @@ namespace AnalisadorSintatico.Wpf.Modelos
             }
 
             return inlines;
+        }
+
+        private List<string> ProducoesParaLista(NT naoTerminal)
+        {
+            var lista = new List<string>();
+
+            string simbolo = "";
+
+            foreach (var p in naoTerminal.Producoes)
+            {
+                for (int i = p.Valor.Length - 1; i >= 0; i--)
+                {
+                    simbolo = simbolo.Insert(0, p.Valor[i].ToString());
+
+                    if (Terminais.Any(t => t.Valor.Equals(simbolo)) ||
+                        NaoTerminais.Any(nt => nt.Valor.Equals(simbolo)))
+                    {
+                        lista.Add(simbolo);
+                        simbolo = "";
+                    }
+                }
+            }
+
+            lista.Reverse();
+            lista.Insert(0, ".");
+            return lista;
         }
     }
 }
