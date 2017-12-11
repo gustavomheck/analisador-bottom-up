@@ -5,6 +5,7 @@
 ///</summary>
 
 using AnalisadorSintatico.Wpf.Modelos;
+using AnalisadorSintatico.Wpf.Util;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -53,6 +54,13 @@ namespace AnalisadorSintatico.Wpf.Views
 
         private void GerarTabela(object sender, RoutedEventArgs e)
         {
+            List<List<string>> tabela;
+
+            using (var excel = new ExcelInterop())
+            {
+                tabela = excel.LerTabela(@"C:\Users\heck_\Desktop\tabela.xlsx");
+            }
+
             if (_gramatica.NaoTerminais.Count == 0)
             {
                 labelAviso.Content = "Nenhum Não-Terminal";
@@ -64,8 +72,8 @@ namespace AnalisadorSintatico.Wpf.Views
             else
             {
                 labelAviso.Content = "";
-                var tabela = new TabelaWindow(_gramatica/*,producoes.Text.Substring(0, producoes.Text.Length - 2)*/);
-                tabela.Show();
+                var wnd = new TabelaWindow(_gramatica, tabela);
+                wnd.Show();
             }
         }
 

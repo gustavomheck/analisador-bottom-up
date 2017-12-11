@@ -11,6 +11,8 @@
         public string Gerador { get; set; }
         public string Valor { get; set; }
 
-        public override string ToString() => Gerador + " ← " + Valor;
+        public string ProducaoFormatada => Gerador + " ← " + Valor;
+
+        public override string ToString() => Valor;
     }
 }

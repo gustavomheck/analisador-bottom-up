@@ -26,6 +26,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <Label Grid.Row="0"
@@ -131,7 +132,15 @@
                    Style="{StaticResource TextBlockStyle}"
                    Visibility="Collapsed" />
 
-        <Border Grid.Row="5"
+        <Label Grid.Row="5"
+               Content="Arquivo Excel para a Tabela LSR"
+               Style="{StaticResource LabelDividerStyle}" />
+
+        <Grid>
+            
+        </Grid>
+        
+        <Border Grid.Row="7"
                 Background="WhiteSmoke"
                 BorderBrush="Silver"
                 BorderThickness="0,1,0,0"

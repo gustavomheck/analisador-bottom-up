@@ -39,6 +39,11 @@ namespace AnalisadorSintatico.Wpf.Modelos
         public List<Producao> Producoes { get; internal set; }
 
         /// <summary>
+        /// Obtém ou efine as produções canonizadas da gramática.
+        /// </summary>
+        public List<ProducaoCanonica> ProducoesCanonizadas { get; set; }
+
+        /// <summary>
         /// Determina se o simbolo é um Terminal.
         /// </summary>
         /// <param name="simbolo">O simbolo a ser testado.</param>
@@ -280,22 +285,60 @@ namespace AnalisadorSintatico.Wpf.Modelos
 
         private List<ProducaoCanonica> CanonizarProducoes()
         {
-            var producoes = new List<ProducaoCanonica>();
-            var p1 = new ProducaoCanonica(SimboloInicial.Valor + "'", new List<string>()
+            if (ProducoesCanonizadas == null)
             {
-                ".", SimboloInicial.Valor
-            });
+                ProducoesCanonizadas = new List<ProducaoCanonica>()
+                {
+                    new ProducaoCanonica(SimboloInicial.Valor + "'", new List<string>()
+                    {
+                        ".", SimboloInicial.Valor
+                    })
+                };
 
-            producoes.Add(p1);
-
-            foreach (var nt in NaoTerminais)
-            {
-                var p = new List<string>();
-                p.AddRange(ProducoesParaLista(nt));
-                producoes.Add(new ProducaoCanonica(nt.Valor, p));
+                foreach (var nt in NaoTerminais)
+                {
+                    foreach (var p in nt.Producoes)
+                    {
+                        ProducoesCanonizadas.Add(new ProducaoCanonica(nt.Valor, ProducoesParaLista(p)));
+                    }
+                }
             }
 
-            return producoes;
+            var retorno = new List<ProducaoCanonica>() { ProducoesCanonizadas[0] };
+            var pcAtual = ProducoesCanonizadas[1];
+
+            foreach (var p in ProducoesCanonizadas.Find(nt => nt.Gerador == pcAtual.Gerador).Producao)
+            {
+                AdicionarProducaoCanonica();
+            }
+            
+            void AdicionarProducaoCanonica()
+            {
+                int i = 0;
+
+                while (pcAtual != null && i < (pcAtual.Producao.Count - 1))
+                {
+                    retorno.Add(pcAtual);
+
+                    if (pcAtual.Producao[i] == "." && IsNaoTerminal(pcAtual.Producao[i + 1]))
+                    {
+                        pcAtual = ProducoesCanonizadas.FirstOrDefault(pc => pc.Gerador == pcAtual.Producao[i + 1]);
+
+                        if (pcAtual == null)
+                            return;
+                        //else
+                        //    retorno.Add(pcAtual);
+
+                        AdicionarProducaoCanonica();
+                    }
+
+                    i++;
+                }
+
+                pcAtual = null;
+            }
+
+            return retorno;
         }
 
         public void Empilhar()
@@ -422,24 +465,21 @@ namespace AnalisadorSintatico.Wpf.Modelos
             return inlines;
         }
 
-        private List<string> ProducoesParaLista(NT naoTerminal)
+        private List<string> ProducoesParaLista(Producao producao)
         {
             var lista = new List<string>();
 
             string simbolo = "";
 
-            foreach (var p in naoTerminal.Producoes)
+            for (int i = producao.Valor.Length - 1; i >= 0; i--)
             {
-                for (int i = p.Valor.Length - 1; i >= 0; i--)
-                {
-                    simbolo = simbolo.Insert(0, p.Valor[i].ToString());
+                simbolo = simbolo.Insert(0, producao.Valor[i].ToString());
 
-                    if (Terminais.Any(t => t.Valor.Equals(simbolo)) ||
-                        NaoTerminais.Any(nt => nt.Valor.Equals(simbolo)))
-                    {
-                        lista.Add(simbolo);
-                        simbolo = "";
-                    }
+                if (Terminais.Any(t => t.Valor.Equals(simbolo)) ||
+                    NaoTerminais.Any(nt => nt.Valor.Equals(simbolo)))
+                {
+                    lista.Add(simbolo);
+                    simbolo = "";
                 }
             }
 
