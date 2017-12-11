@@ -167,7 +167,7 @@
                 <Button Grid.Column="3"
                         Content="Gramática 2"
                         Click="Gramatica2"
-                        ToolTip="Gerar uma gramática alternativa para testar o programa" Visibility="Collapsed" />
+                        ToolTip="Gerar uma gramática alternativa para testar o programa" />
                 <Button Grid.Column="4"
                         Content="Gramática 3"
                         Click="Gramatica3"

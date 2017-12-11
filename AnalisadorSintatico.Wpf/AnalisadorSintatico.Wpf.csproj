@@ -105,6 +105,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="tabela.xlsx" />
+    <None Include="tabela2.xlsx" />
     <Resource Include="Fonts\Roboto-Regular.ttf" />
     <Compile Include="Controles\WatermarkTextBox.cs" />
     <None Include="Properties\Settings.settings">

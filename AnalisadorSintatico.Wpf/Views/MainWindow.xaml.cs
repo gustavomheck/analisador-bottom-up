@@ -58,7 +58,7 @@ namespace AnalisadorSintatico.Wpf.Views
 
             using (var excel = new ExcelInterop())
             {
-                tabela = excel.LerTabela(@"C:\Users\heck_\Desktop\tabela.xlsx");
+                tabela = excel.LerTabela(@"C:\Users\heck_\Source\Repos\analisador-bottom-up\AnalisadorSintatico.Wpf\tabela2.xlsx");
             }
 
             if (_gramatica.NaoTerminais.Count == 0)
@@ -218,13 +218,7 @@ namespace AnalisadorSintatico.Wpf.Views
                 {
                     new NT("E") { Producoes = new List<Producao> { new Producao("E", "E+T"), new Producao("E", "T") } },
                     new NT("T") { Producoes = new List<Producao> { new Producao("T", "T*F"), new Producao("T", "F") } },
-                    new NT("F") { Producoes = new List<Producao> { new Producao("F", "(E)"), new Producao("F", "id") } },
-                    //new NT("G") { Producoes = new List<Producao> { new Producao("(E)"), new Producao("id") } },
-                    //new NT("H") { Producoes = new List<Producao> { new Producao("(E)"), new Producao("id") } },
-                    //new NT("J") { Producoes = new List<Producao> { new Producao("(E)"), new Producao("id") } },
-                    //new NT("K") { Producoes = new List<Producao> { new Producao("(E)"), new Producao("id") } },
-                    //new NT("L") { Producoes = new List<Producao> { new Producao("(E)"), new Producao("id") } },
-                    //new NT("M") { Producoes = new List<Producao> { new Producao("(E)"), new Producao("id") } },
+                    new NT("F") { Producoes = new List<Producao> { new Producao("F", "(E)"), new Producao("F", "id") } }
                 },
                 Terminais = new List<T>()
                 {
@@ -245,19 +239,15 @@ namespace AnalisadorSintatico.Wpf.Views
             {
                 NaoTerminais = new List<NT>()
                 {
-                    new NT("E") { Producoes = new List<Producao> { new Producao("E", "TE'") } },
-                    new NT("E'") { Producoes = new List<Producao> { new Producao("E'", "+TE'"), new Producao("E'", T.Vazio) } },
-                    new NT("T") { Producoes = new List<Producao> { new Producao("T", "FT'") } },
-                    new NT("T'") { Producoes = new List<Producao> { new Producao("T'", "*FT'"), new Producao("T'", T.Vazio) } },
-                    new NT("F") { Producoes = new List<Producao> { new Producao("F", "(E)"), new Producao("F", "id") } }
+                    new NT("S") { Producoes = new List<Producao> { new Producao("S", "a"), new Producao("S", "[L]") } },
+                    new NT("L") { Producoes = new List<Producao> { new Producao("L", "L;S"), new Producao("L", "S") } },
                 },
                 Terminais = new List<T>()
                 {
-                    new T("id"),
-                    new T("+"),
-                    new T("*"),
-                    new T("("),
-                    new T(")"),
+                    new T("a"),
+                    new T("["),
+                    new T("]"),
+                    new T(";"),
                 }
             };
 

@@ -2,20 +2,12 @@
 using AnalisadorSintatico.Wpf.Util;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Forms;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using System.Windows.Shell;
 
 namespace AnalisadorSintatico.Wpf.Views
 {
@@ -25,8 +17,7 @@ namespace AnalisadorSintatico.Wpf.Views
     public partial class TabelaWindow : Window
     {
         private const double GridLength = 40;
-        private readonly List<List<string>> tabelaLSR;
-        private readonly List<Producao> producoes;
+        private List<List<string>> tabelaLSR;
         private readonly Gramatica gramatica;
 
         public TabelaWindow(Gramatica gramatica, List<List<string>> tabelaLSR)
@@ -51,31 +42,21 @@ namespace AnalisadorSintatico.Wpf.Views
 
         private void GerarTabelaLSR()
         {
-            tabelaLSR.Add(new List<string>() { "id", "+", "*", "(", ")", "$", "E", "T", "F" });
-            /*0*/
-            tabelaLSR.Add(new List<string>() { "s5", "", "", "s4", "", "", "1", "2", "3" });
-            /*1*/
-            tabelaLSR.Add(new List<string>() { "", "s6", "", "", "", "aceita", "", "", "" });
-            /*2*/
-            tabelaLSR.Add(new List<string>() { "", "r2", "s7", "", "r2", "r2", "", "", "" });
-            /*3*/
-            tabelaLSR.Add(new List<string>() { "", "r4", "r4", "", "r4", "r4", "", "", "" });
-            /*4*/
-            tabelaLSR.Add(new List<string>() { "s5", "", "", "s4", "", "", "8", "2", "3" });
-            /*5*/
-            tabelaLSR.Add(new List<string>() { "", "r6", "r6", "  ", "r6", "r6", "", "", "" });
-            /*6*/
-            tabelaLSR.Add(new List<string>() { "s5", "", "", "s4", "", "", "", "9", "3" });
-            /*7*/
-            tabelaLSR.Add(new List<string>() { "s5", "", "", "s4", "", "", "", "", "10" });
-            /*8*/
-            tabelaLSR.Add(new List<string>() { "", "s6", "", "", "s11", "", "", "", "" });
-            /*9*/
-            tabelaLSR.Add(new List<string>() { "", "r1", "s7", "", "r1", "r1", "", "", "" });
-            /*10*/
-            tabelaLSR.Add(new List<string>() { "", "r3", "r3", "", "r3", "r3", "", "", "" });
-            /*11*/
-            tabelaLSR.Add(new List<string>() { "", "r3", "r5", "", "r5", "r5", "", "", "" });
+            //tabelaLSR = new List<List<string>>();
+            //tabelaLSR.Add(new List<string>() { "id", "+", "*", "(", ")", "$", "E", "T", "F" }); // 0
+            //tabelaLSR.Add(new List<string>() { "s5", "", "", "s4", "", "", "1", "2", "3" }); // 1
+            //tabelaLSR.Add(new List<string>() { "", "s6", "", "", "", "aceita", "", "", "" }); // 2
+            //tabelaLSR.Add(new List<string>() { "", "r2", "s7", "", "r2", "r2", "", "", "" }); // 3
+            //tabelaLSR.Add(new List<string>() { "", "r4", "r4", "", "r4", "r4", "", "", "" }); // 4
+            //tabelaLSR.Add(new List<string>() { "s5", "", "", "s4", "", "", "8", "2", "3" }); // 5
+            //tabelaLSR.Add(new List<string>() { "", "r6", "r6", "  ", "r6", "r6", "", "", "" }); // 6
+            //tabelaLSR.Add(new List<string>() { "s5", "", "", "s4", "", "", "", "9", "3" }); // 7
+            //tabelaLSR.Add(new List<string>() { "s5", "", "", "s4", "", "", "", "", "10" }); // 8
+            //tabelaLSR.Add(new List<string>() { "", "s6", "", "", "s11", "", "", "", "" }); // 9
+            //tabelaLSR.Add(new List<string>() { "", "r1", "s7", "", "r1", "r1", "", "", "" }); // 10
+            //tabelaLSR.Add(new List<string>() { "", "r3", "r3", "", "r3", "r3", "", "", "" }); // 11
+            //tabelaLSR.Add(new List<string>() { "", "r3", "r5", "", "r5", "r5", "", "", "" }); // 12
+
             foreach (var s1 in tabelaLSR)
             {
                 foreach (var s2 in s1)
@@ -85,8 +66,7 @@ namespace AnalisadorSintatico.Wpf.Views
 
                 Debug.WriteLine("");
             }
-
-            //itemsControlLSR.ItemsSource = tabelaLSR;
+            
             double lenght1 = ((gramatica.Terminais.Count + 1) * 100) / (gramatica.Terminais.Count + gramatica.NaoTerminais.Count + 1) + 0.4;
             double lenght2 = 100 - lenght1 - 0.4;
 
