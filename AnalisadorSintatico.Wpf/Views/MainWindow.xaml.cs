@@ -1,5 +1,6 @@
 ﻿///<summary>
 /// Gustavo Miguel Heck M96619
+/// Leonardo dos Santos MXXXXX
 /// Universidade de Santa Cruz do Sul
 /// Compiladores - 2017/2
 ///</summary>
@@ -14,7 +15,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Threading;
 
 namespace AnalisadorSintatico.Wpf.Views
 {
@@ -33,11 +33,6 @@ namespace AnalisadorSintatico.Wpf.Views
             _gramatica = new Gramatica();
             _producoes = new ObservableCollection<NT>();
             itemsControl.ItemsSource = _producoes;
-
-            Loaded += (s, e) =>
-            {
-                Dispatcher.BeginInvoke(new Action(() => Gramatica1(null, e)), DispatcherPriority.Background);
-            };
         }
 
         private void Setup()
@@ -58,7 +53,7 @@ namespace AnalisadorSintatico.Wpf.Views
 
             using (var excel = new ExcelInterop())
             {
-                tabela = excel.LerTabela(@"C:\Users\heck_\Source\Repos\analisador-bottom-up\AnalisadorSintatico.Wpf\tabela2.xlsx");
+                tabela = excel.LerTabela(textBoxExcel.Text);
             }
 
             if (_gramatica.NaoTerminais.Count == 0)
@@ -229,7 +224,7 @@ namespace AnalisadorSintatico.Wpf.Views
                     new T("id"),
                 }
             };
-
+            
             Setup();
         }
 
@@ -260,21 +255,30 @@ namespace AnalisadorSintatico.Wpf.Views
             {
                 NaoTerminais = new List<NT>()
                 {
-                    new NT("E") { Producoes = new List<Producao> { new Producao("E", "E/T'"), new Producao("E", "T") } },
-                    new NT("T") { Producoes = new List<Producao> { new Producao("T", "T&F"), new Producao("T", "F") } },
-                    new NT("F") { Producoes = new List<Producao> { new Producao("F", "(E)"), new Producao("F", "id") } }
+                    new NT("S") { Producoes = new List<Producao> { new Producao("S", "AB") } },
+                    new NT("A") { Producoes = new List<Producao> { new Producao("A", "a") } },
+                    new NT("B") { Producoes = new List<Producao> { new Producao("B", "b") } }
                 },
                 Terminais = new List<T>()
                 {
-                    new T("id"),
-                    new T("/"),
-                    new T("&"),
-                    new T("("),
-                    new T(")"),
+                    new T("a"),
+                    new T("b")
                 }
             };
 
             Setup();
+        }
+
+        private void ProcurarOnClick(object sender, RoutedEventArgs e)
+        {
+            var ofd = new System.Windows.Forms.OpenFileDialog();
+            ofd.Filter = "Arquivos excel|*.xlsx";
+            ofd.Title = "Selecione o arquivo com a tebela";
+            
+            if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                textBoxExcel.Text = ofd.FileName; 
+            }
         }
     }
 }

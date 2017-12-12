@@ -28,7 +28,7 @@ namespace AnalisadorSintatico.Wpf.Views
             this.gramatica.NumerarProducoes();
             this.tabelaLSR = tabelaLSR;
 
-            this.gramatica.OrdenarTerminaisAlfabeticamente();
+            //this.gramatica.OrdenarTerminaisAlfabeticamente();
             GerarTabelaLSR();
         }
 
@@ -146,11 +146,15 @@ namespace AnalisadorSintatico.Wpf.Views
                     TerminarExecucao("Rejeita");
                     break;
                 }
+                else if (acao.ToUpper() == "ACEITA")
+                {
+                    TerminarExecucao("Aceita");
+                }
 
                 // Transforma a ação em um vetor de char, para identificar se deve empilhar ou reduzir.
                 var partes = acao.ToCharArray();
 
-                if (partes[0] == 's')
+                if (partes[0] == 's' || partes[0] == 'e')
                 {
                     AdicionarLinha("Empilhar");
 
@@ -167,15 +171,15 @@ namespace AnalisadorSintatico.Wpf.Views
                 else if (partes[0] == 'r')
                 {
                     Producao prod = gramatica.Producoes[Convert.ToInt32(partes[1].ToString()) - 1];
-                    AdicionarLinha("Reduzir " + prod);
+                    AdicionarLinha("Reduzir " + prod.ProducaoFormatada);
 
                     // Reduz e retorna o próximo estado.
                     estado = gramatica.Reduzir(pilha, tabelaLSR, prod);   
                     
-                    if (prod.Gerador == gramatica.SimboloInicial.Valor && entrada.Count == 1)
-                    {
-                        TerminarExecucao("Aceita");
-                    }
+                    //if (prod.Gerador == gramatica.SimboloInicial.Valor && entrada.Count == 1)
+                    //{
+                    //    TerminarExecucao("Aceita");
+                    //}
                 }                
             }
 

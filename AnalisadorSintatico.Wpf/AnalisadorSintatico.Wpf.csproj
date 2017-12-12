@@ -106,6 +106,7 @@
     </EmbeddedResource>
     <None Include="tabela.xlsx" />
     <None Include="tabela2.xlsx" />
+    <None Include="tabela3.xlsx" />
     <Resource Include="Fonts\Roboto-Regular.ttf" />
     <Compile Include="Controles\WatermarkTextBox.cs" />
     <None Include="Properties\Settings.settings">

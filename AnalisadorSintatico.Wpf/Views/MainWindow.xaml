@@ -136,10 +136,31 @@
                Content="Arquivo Excel para a Tabela LSR"
                Style="{StaticResource LabelDividerStyle}" />
 
-        <Grid>
-            
+        <Grid Grid.Row="6"
+              Margin="20,5,5,5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Label Content="Caminho" />
+            <TextBox Grid.Row="2"
+                     Name="textBoxExcel"
+                     CharacterCasing="Lower"
+                     MaxLength="2"
+                     KeyUp="AdicionarTerminalOnKeyUp"
+                     IsEnabled="False" />
+            <Button Grid.Column="1"
+                    Grid.Row="2"
+                    Content="Procurar"
+                    Click="ProcurarOnClick"
+                    Width="75" />
         </Grid>
-        
+
         <Border Grid.Row="7"
                 Background="WhiteSmoke"
                 BorderBrush="Silver"
@@ -171,10 +192,11 @@
                 <Button Grid.Column="4"
                         Content="Gramática 3"
                         Click="Gramatica3"
-                        ToolTip="Gerar uma gramática alternativa para testar o programa" Visibility="Collapsed" />
+                        ToolTip="Gerar uma gramática alternativa para testar o programa" />
                 <Button Grid.Column="5"
                         Content="Gerar Tabela"
-                        Click="GerarTabela" />
+                        Click="GerarTabela"
+                        IsEnabled="{Binding ElementName=textBoxExcel, Path=Text, Converter={StaticResource StringToBooleanConverter}}" />
                 <Button Grid.Column="6"
                         Content="Reiniciar"
                         Click="Reiniciar"
