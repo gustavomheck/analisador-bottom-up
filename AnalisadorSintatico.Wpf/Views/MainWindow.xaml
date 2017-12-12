@@ -9,6 +9,7 @@
         Title="Analisador Sintático Bottom-Up"
         Height="Auto"
         MinWidth="760"
+        MaxWidth="800"
         SizeToContent="WidthAndHeight"
         SnapsToDevicePixels="True"
         WindowStartupLocation="CenterScreen">

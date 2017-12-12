@@ -19,6 +19,13 @@
 
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel>
+                <Label Content="Produções"
+                       Style="{StaticResource LabelDividerStyle}" />
+                <TextBlock x:Name="textBlockProducoes"
+                           HorizontalAlignment="Left"
+                           TextAlignment="Left"
+                           Margin="10,3,0,0"
+                           Style="{StaticResource TextBlockStyle}" />
                 <Label Content="Tabela Sintática LSR"
                        Style="{StaticResource LabelDividerStyle}" />
                 <Border BorderThickness="1"

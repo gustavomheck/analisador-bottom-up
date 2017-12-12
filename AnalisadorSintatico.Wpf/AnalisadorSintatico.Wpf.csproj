@@ -54,9 +54,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Controles\BindableTextBlock.cs" />
-    <Compile Include="Modelos\Estado.cs" />
     <Compile Include="Modelos\Linha.cs" />
-    <Compile Include="Modelos\ProducaoCanonica.cs" />
     <Compile Include="Util\ExcelInterop.cs" />
     <Compile Include="Util\UIUtil.cs" />
     <Compile Include="Views\TabelaWindow.xaml.cs">
@@ -104,8 +102,8 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="tabela.xlsx" />
     <None Include="tabela2.xlsx" />
+    <None Include="tabela1.xlsx" />
     <None Include="tabela3.xlsx" />
     <Resource Include="Fonts\Roboto-Regular.ttf" />
     <Compile Include="Controles\WatermarkTextBox.cs" />

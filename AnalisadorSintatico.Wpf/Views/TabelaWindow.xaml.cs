@@ -2,10 +2,11 @@
 using AnalisadorSintatico.Wpf.Util;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Forms;
 using System.Windows.Media;
 
@@ -28,8 +29,7 @@ namespace AnalisadorSintatico.Wpf.Views
             this.gramatica.NumerarProducoes();
             this.tabelaLSR = tabelaLSR;
 
-            //this.gramatica.OrdenarTerminaisAlfabeticamente();
-            GerarTabelaLSR();
+            PrintarProducoes();
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -40,64 +40,21 @@ namespace AnalisadorSintatico.Wpf.Views
             MaxHeight = bounds.Height - 50;             
         }
 
-        private void GerarTabelaLSR()
+        private void ReconhecerEntrada(object sender, RoutedEventArgs e)
         {
-            //tabelaLSR = new List<List<string>>();
-            //tabelaLSR.Add(new List<string>() { "id", "+", "*", "(", ")", "$", "E", "T", "F" }); // 0
-            //tabelaLSR.Add(new List<string>() { "s5", "", "", "s4", "", "", "1", "2", "3" }); // 1
-            //tabelaLSR.Add(new List<string>() { "", "s6", "", "", "", "aceita", "", "", "" }); // 2
-            //tabelaLSR.Add(new List<string>() { "", "r2", "s7", "", "r2", "r2", "", "", "" }); // 3
-            //tabelaLSR.Add(new List<string>() { "", "r4", "r4", "", "r4", "r4", "", "", "" }); // 4
-            //tabelaLSR.Add(new List<string>() { "s5", "", "", "s4", "", "", "8", "2", "3" }); // 5
-            //tabelaLSR.Add(new List<string>() { "", "r6", "r6", "  ", "r6", "r6", "", "", "" }); // 6
-            //tabelaLSR.Add(new List<string>() { "s5", "", "", "s4", "", "", "", "9", "3" }); // 7
-            //tabelaLSR.Add(new List<string>() { "s5", "", "", "s4", "", "", "", "", "10" }); // 8
-            //tabelaLSR.Add(new List<string>() { "", "s6", "", "", "s11", "", "", "", "" }); // 9
-            //tabelaLSR.Add(new List<string>() { "", "r1", "s7", "", "r1", "r1", "", "", "" }); // 10
-            //tabelaLSR.Add(new List<string>() { "", "r3", "r3", "", "r3", "r3", "", "", "" }); // 11
-            //tabelaLSR.Add(new List<string>() { "", "r3", "r5", "", "r5", "r5", "", "", "" }); // 12
-
-            foreach (var s1 in tabelaLSR)
+            try
             {
-                foreach (var s2 in s1)
-                {
-                    Debug.Write(s2 + " ");
-                }
-
-                Debug.WriteLine("");
+                ReconhecerEntrada();
             }
-            
-            double lenght1 = ((gramatica.Terminais.Count + 1) * 100) / (gramatica.Terminais.Count + gramatica.NaoTerminais.Count + 1) + 0.4;
-            double lenght2 = 100 - lenght1 - 0.4;
-
-            UIUtil.AddColumns(gridHeader, lenght1, lenght2);
-            UIUtil.AddColumns(gramatica.Terminais, gridAcao);
-            gridAcao.ColumnDefinitions.Add(new ColumnDefinition());
-            gridAcao.Children.Add(UIUtil.CreateTextBlock("$", 0, gramatica.Terminais.Count));
-            UIUtil.AddColumns(gramatica.NaoTerminais, gridDesvio);            
-
-            for (int i = 1; i < tabelaLSR.Count; i++)
+            catch (Exception)
             {
-                var gridTemplate = new Grid();
-                UIUtil.AddColumns(gridTemplate, lenght1, lenght2);
-
-                var tbEstado = UIUtil.CreateTextBlock((i - 1).ToString(), 0, 0);
-                var borderAcao = UIUtil.CreateGrid(1);
-                var borderDesvio = UIUtil.CreateGrid(2);
-
-                UIUtil.AddColumns(tabelaLSR[i].GetRange(0, gramatica.Terminais.Count + 1), (Grid)borderAcao.Child, true);
-                UIUtil.AddColumns(tabelaLSR[i].GetRange(gramatica.Terminais.Count + 1, gramatica.NaoTerminais.Count), (Grid)borderDesvio.Child);
-
-                gridTemplate.Children.Add(tbEstado);
-                gridTemplate.Children.Add(borderAcao);
-                gridTemplate.Children.Add(borderDesvio);
-                stackPanelTabela.Children.Add(gridTemplate);
+                System.Windows.MessageBox.Show("Tabela SLR incorreta", "Algo deu errado");
             }
         }
 
-        private void ReconhecerEntrada(object sender, RoutedEventArgs e)
+        private void ReconhecerEntrada()
         {
-            var linhas = new List<Linha>();
+            var linhas = new ObservableCollection<Linha>();
             itemsControl.ItemsSource = linhas;
 
             if (String.IsNullOrWhiteSpace(textBoxEntrada.Text))
@@ -110,7 +67,7 @@ namespace AnalisadorSintatico.Wpf.Views
             var fim = false;
             var estado = 0;
             var linha = 0;
-            
+
             var pilha = new Stack<string>();
             var entrada = gramatica.EntradaParaPilha(textBoxEntrada.Text.Replace(" ", ""));
 
@@ -149,6 +106,7 @@ namespace AnalisadorSintatico.Wpf.Views
                 else if (acao.ToUpper() == "ACEITA")
                 {
                     TerminarExecucao("Aceita");
+                    break;
                 }
 
                 // Transforma a ação em um vetor de char, para identificar se deve empilhar ou reduzir.
@@ -174,13 +132,8 @@ namespace AnalisadorSintatico.Wpf.Views
                     AdicionarLinha("Reduzir " + prod.ProducaoFormatada);
 
                     // Reduz e retorna o próximo estado.
-                    estado = gramatica.Reduzir(pilha, tabelaLSR, prod);   
-                    
-                    //if (prod.Gerador == gramatica.SimboloInicial.Valor && entrada.Count == 1)
-                    //{
-                    //    TerminarExecucao("Aceita");
-                    //}
-                }                
+                    estado = gramatica.Reduzir(pilha, tabelaLSR, prod);
+                }
             }
 
             void AdicionarAviso(string aviso, SolidColorBrush cor)
@@ -196,7 +149,7 @@ namespace AnalisadorSintatico.Wpf.Views
                     Acao = acao,
                     Passo = linha,
                     Entrada = gramatica.EntradaParaInline(entrada),
-                    Pilha = gramatica.PilhaParaInline(pilha) 
+                    Pilha = gramatica.PilhaParaInline(pilha)
                 };
 
                 linhas.Add(l);
@@ -207,6 +160,59 @@ namespace AnalisadorSintatico.Wpf.Views
                 fim = true;
                 linha++;
                 AdicionarLinha(acao);
+            }
+        }
+
+        public bool GerarTabelaLSR()
+        {
+            try
+            {
+                double lenght1 = ((gramatica.Terminais.Count + 1) * 100) / (gramatica.Terminais.Count + gramatica.NaoTerminais.Count + 1) + 0.4;
+                double lenght2 = 100 - lenght1 - 0.4;
+
+                UIUtil.AddColumns(gridHeader, lenght1, lenght2);
+                UIUtil.AddColumns(gramatica.Terminais, gridAcao);
+                gridAcao.ColumnDefinitions.Add(new ColumnDefinition());
+                gridAcao.Children.Add(UIUtil.CreateTextBlock("$", 0, gramatica.Terminais.Count));
+                UIUtil.AddColumns(gramatica.NaoTerminais, gridDesvio);
+
+                for (int i = 1; i < tabelaLSR.Count; i++)
+                {
+                    var gridTemplate = new Grid();
+                    UIUtil.AddColumns(gridTemplate, lenght1, lenght2);
+
+                    var tbEstado = UIUtil.CreateTextBlock((i - 1).ToString(), 0, 0);
+                    var borderAcao = UIUtil.CreateGrid(1);
+                    var borderDesvio = UIUtil.CreateGrid(2);
+
+                    UIUtil.AddColumns(tabelaLSR[i].GetRange(0, gramatica.Terminais.Count + 1), (Grid)borderAcao.Child, true);
+                    UIUtil.AddColumns(tabelaLSR[i].GetRange(gramatica.Terminais.Count + 1, gramatica.NaoTerminais.Count), (Grid)borderDesvio.Child);
+
+                    gridTemplate.Children.Add(tbEstado);
+                    gridTemplate.Children.Add(borderAcao);
+                    gridTemplate.Children.Add(borderDesvio);
+                    stackPanelTabela.Children.Add(gridTemplate);
+                }
+
+                return true;
+            }
+            catch (Exception)
+            {
+                System.Windows.MessageBox.Show("Arquivo Excel com formato incorreto", "Algo deu errado");
+                return false;
+            }
+        }
+
+        private void PrintarProducoes()
+        {
+            for (int i = 0; i < gramatica.Producoes.Count; i++)
+            {
+                textBlockProducoes.Inlines.Add((i + 1) + ".  ");
+                textBlockProducoes.Inlines.Add(new Run()
+                {
+                    FontStyle = FontStyles.Italic,
+                    Text = gramatica.Producoes[i].ProducaoFormatada + Environment.NewLine
+                });
             }
         }
     }

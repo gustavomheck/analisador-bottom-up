@@ -37,12 +37,7 @@ namespace AnalisadorSintatico.Wpf.Modelos
         /// Obtém ou define as produções da gramática.
         /// </summary>
         public List<Producao> Producoes { get; internal set; }
-
-        /// <summary>
-        /// Obtém ou efine as produções canonizadas da gramática.
-        /// </summary>
-        public List<ProducaoCanonica> ProducoesCanonizadas { get; set; }
-
+        
         /// <summary>
         /// Determina se o simbolo é um Terminal.
         /// </summary>
@@ -72,33 +67,7 @@ namespace AnalisadorSintatico.Wpf.Modelos
         }
 
         /// <summary>
-        /// Obtém ou define o primeiro símbolo de uma produção.
-        /// </summary>
-        /// <param name="producao">A produção para extrair o símbolo.</param>
-        /// <returns>O primeiro símbolo ou a própria produção.</returns>
-        public string ObterPrimeiroSimbolo(string producao)
-        {
-            string simbolo = "";
-
-            foreach (char c in producao)
-            {
-                simbolo += c;
-
-                foreach (T t in Terminais)
-                    if (simbolo.Equals(t.Valor))
-                        return simbolo;
-
-                if (Char.IsUpper(c))
-                    foreach (NT nt in NaoTerminais)
-                        if (simbolo.Equals(nt.Valor))
-                            return simbolo;
-            }
-
-            return producao;
-        }
-
-        /// <summary>
-        /// 
+        /// Numera as produções para serem printadas.
         /// </summary>
         public void NumerarProducoes()
         {
@@ -107,45 +76,6 @@ namespace AnalisadorSintatico.Wpf.Modelos
             foreach (var nt in NaoTerminais)
                 foreach (var p in nt.Producoes)
                     Producoes.Add(p);
-
-            //{
-            //    new Producao("E", "E+T"),
-            //    new Producao("E", "T"),
-            //    new Producao("T", "T*F"),
-            //    new Producao("T", "F"),
-            //    new Producao("F", "(E)"),
-            //    new Producao("F", "id")
-            //};
-        }
-
-        /// <summary>
-        /// Obtém o próximo símbolo Não-Terminal depois de um determinado Não-Terminal.
-        /// </summary>
-        /// <param name="naoTerminal">O Não-Terminal para tomar como parâmetro.</param>
-        /// <param name="producao">A produção para analisar.</param>
-        /// <returns>O próximo Não-Terminal.</returns>
-        public string ObterProximoNaoTerminal(string naoTerminal, string producao)
-        {
-            int indice = producao.ContainsAt(naoTerminal);
-
-            if (indice == -1) return null;
-
-            if (naoTerminal.Length == 1 && indice == (producao.Length - 1) ||
-                naoTerminal.Length == 2 && indice == (producao.Length - 2))
-            {
-                return producao.Substring(indice);
-            }
-            else
-            {
-                int i = indice + (naoTerminal.Length == 1 ? 1 : 2);
-
-                if (i < (producao.Length - 1) && producao[i + 1].ToString().Equals("'"))
-                {
-                    return producao.Substring(i, 2);
-                }
-
-                return producao.Substring(i, 1);
-            }            
         }
 
         /// <summary>
@@ -173,34 +103,7 @@ namespace AnalisadorSintatico.Wpf.Modelos
 
             return pilha;
         }
-
-        /// <summary>
-        /// Transforma os simbolos de uma produção em uma lista.
-        /// </summary>
-        /// <param name="p">A produção a ser transformada.</param>
-        /// <returns>Uma lista com todos os símbolos da produção.</returns>
-        public List<string> ObterSimbolosDaProducao(string p)
-        {
-            var simbolos = new List<string>();
-            string simbolo = "";
-
-            p = String.Join("", p.Split(new[] { '→' }, StringSplitOptions.RemoveEmptyEntries)).Trim();
-
-            for (int i = p.Length - 1; i >= 0; i--)
-            {
-                simbolo = simbolo.Insert(0, p[i].ToString());
-
-                if (Terminais.Any(t => t.Valor.Equals(simbolo)) ||
-                    NaoTerminais.Any(nt => nt.Valor.Equals(simbolo)))
-                {
-                    simbolos.Add(simbolo);
-                    simbolo = "";
-                }
-            }
-
-            return simbolos;
-        }
-
+        
         /// <summary>
         /// Valida uma produção, antes de adicionar à gramática.
         /// </summary>
@@ -262,7 +165,7 @@ namespace AnalisadorSintatico.Wpf.Modelos
         }
         
         /// <summary>
-        /// 
+        /// Ordena os terminais de forma alfabética.
         /// </summary>
         public void OrdenarTerminaisAlfabeticamente()
         {
@@ -282,88 +185,9 @@ namespace AnalisadorSintatico.Wpf.Modelos
                 }
             }
         }
-
-        private List<ProducaoCanonica> CanonizarProducoes()
-        {
-            if (ProducoesCanonizadas == null)
-            {
-                ProducoesCanonizadas = new List<ProducaoCanonica>()
-                {
-                    new ProducaoCanonica(SimboloInicial.Valor + "'", new List<string>()
-                    {
-                        ".", SimboloInicial.Valor
-                    })
-                };
-
-                foreach (var nt in NaoTerminais)
-                {
-                    foreach (var p in nt.Producoes)
-                    {
-                        ProducoesCanonizadas.Add(new ProducaoCanonica(nt.Valor, ProducoesParaLista(p)));
-                    }
-                }
-            }
-
-            var retorno = new List<ProducaoCanonica>() { ProducoesCanonizadas[0] };
-            var pcAtual = ProducoesCanonizadas[1];
-
-            foreach (var p in ProducoesCanonizadas.Find(nt => nt.Gerador == pcAtual.Gerador).Producao)
-            {
-                AdicionarProducaoCanonica();
-            }
-            
-            void AdicionarProducaoCanonica()
-            {
-                int i = 0;
-
-                while (pcAtual != null && i < (pcAtual.Producao.Count - 1))
-                {
-                    retorno.Add(pcAtual);
-
-                    if (pcAtual.Producao[i] == "." && IsNaoTerminal(pcAtual.Producao[i + 1]))
-                    {
-                        pcAtual = ProducoesCanonizadas.FirstOrDefault(pc => pc.Gerador == pcAtual.Producao[i + 1]);
-
-                        if (pcAtual == null)
-                            return;
-                        //else
-                        //    retorno.Add(pcAtual);
-
-                        AdicionarProducaoCanonica();
-                    }
-
-                    i++;
-                }
-
-                pcAtual = null;
-            }
-
-            return retorno;
-        }
-
-        public void Empilhar()
-        {
-            var estados = new List<Estado>();
-
-            var estado = new Estado()
-            {
-                EstadoAtual = 0,
-                EstadoAnterior = -1,
-                NaoTerminalGerador = null,
-                Producoes = CanonizarProducoes()
-            };
-
-            estados.Add(estado);
-            System.Diagnostics.Debug.WriteLine(estado.ToString());
-        }
-
-        public void Reduzir()
-        {
-
-        }
-
+        
         /// <summary>
-        /// 
+        /// Processo de redução.
         /// </summary>
         /// <param name="pilha"></param>
         /// <param name="tabelaSLR"></param>

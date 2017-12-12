@@ -32,7 +32,7 @@ namespace AnalisadorSintatico.Wpf.Util
                 {
                     if (_xlRange.Cells[i, j] != null && _xlRange.Cells[i, j].Value2 != null)
                     {
-                        _tabelaLSR[_tabelaLSR.Count - 1].Add(_xlRange.Cells[i, j].Value2.ToString());
+                        _tabelaLSR[_tabelaLSR.Count - 1].Add(_xlRange.Cells[i, j].Value2.ToString().Trim());
                     }
                     else
                     {

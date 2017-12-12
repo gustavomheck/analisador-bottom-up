@@ -68,7 +68,9 @@ namespace AnalisadorSintatico.Wpf.Views
             {
                 labelAviso.Content = "";
                 var wnd = new TabelaWindow(_gramatica, tabela);
-                wnd.Show();
+
+                if (wnd.GerarTabelaLSR())
+                    wnd.Show();
             }
         }
 
@@ -217,11 +219,11 @@ namespace AnalisadorSintatico.Wpf.Views
                 },
                 Terminais = new List<T>()
                 {
+                    new T("id"),
                     new T("+"),
                     new T("*"),
                     new T("("),
                     new T(")"),
-                    new T("id"),
                 }
             };
             
