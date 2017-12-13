@@ -1,11 +1,4 @@
-﻿///<summary>
-/// Gustavo Miguel Heck M96619
-/// Leonardo dos Santos MXXXXX
-/// Universidade de Santa Cruz do Sul
-/// Compiladores - 2017/2
-///</summary>
-
-using AnalisadorSintatico.Wpf.Modelos;
+﻿using AnalisadorSintatico.Wpf.Modelos;
 using AnalisadorSintatico.Wpf.Util;
 using System;
 using System.Collections.Generic;

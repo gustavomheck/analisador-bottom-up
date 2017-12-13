@@ -1,4 +1,11 @@
-﻿using System.Windows;
+﻿///<summary>
+/// Gustavo Miguel Heck
+/// Leonardo Nunes
+/// Universidade de Santa Cruz do Sul
+/// Compiladores - 2017/2
+///</summary>
+
+using System.Windows;
 using AnalisadorSintatico.Wpf.Views;
 
 namespace AnalisadorSintatico.Wpf
